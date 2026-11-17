@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#000000">
+<title>YanCo RPG</title>
+<link rel="icon" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="style.css?v=4c62f5f22d">
+</head>
+<body>
+<!-- the main menu: shown at once, before the game itself has loaded -->
+<section id="title" class="screen on">
+  <canvas id="title-art"></canvas>
+  <div id="title-banner"><span>YanCo Branded RPG</span></div>
+  <div id="title-menu" class="frame">
+    <button class="plank primary" data-go="continue" hidden>Continue</button>
+    <button class="plank primary" data-go="new">New game</button>
+  </div>
+  <div id="title-world" class="plaque"></div>
+  <div id="title-loading" class="plaque" hidden></div>
+</section>
+
+<!-- the game: the walking map above, the controls below -->
+<section id="game" class="screen">
+  <div id="top">
+    <canvas id="map"></canvas>
+    <canvas id="fight-canvas" hidden></canvas>
+    <div id="fight-tip" hidden></div>
+    <div id="hud"></div>
+    <div id="hint"></div>
+    <div id="zoom"><button data-zoom="1">+</button><button data-zoom="-1">−</button></div>
+  </div>
+  <div id="hinge"></div>
+  <div id="bottom">
+    <div id="fightpad" hidden>
+      <nav id="fight-tabs"></nav>
+      <div id="fight-status"></div>
+      <div id="fight-body">
+        <div id="fight-menu">
+          <div class="choice-head"><b id="fight-menu-title"></b></div>
+          <div id="fight-grid"></div>
+          <div id="fight-pager"><button data-page="-1">◀</button><span id="fight-page"></span><button data-page="1">▶</button></div>
+          <div id="fight-desc"></div>
+          <div class="foot"><button class="cmd" id="fight-menu-back">Back</button><button class="cmd accent" id="fight-menu-go">Go</button></div>
+        </div>
+        <div id="fight-info" hidden>
+          <b id="fight-info-title"></b>
+          <p id="fight-info-text"></p>
+          <div class="foot"><button class="cmd" id="fight-info-back">Back</button><button class="cmd accent" id="fight-info-go">Go</button></div>
+        </div>
+      </div>
+    </div>
+    <nav id="tabs">
+      <button data-tab="walk" class="on">Walk</button><button data-tab="bag">Bag</button><button data-tab="party">Party</button><button data-tab="quests">Quests</button><button data-tab="map">Map</button><button data-tab="settings">Settings</button>
+    </nav>
+    <div id="pages">
+      <div class="page on" id="page-walk">
+        <div id="walk-main">
+          <div id="log"></div>
+          <div id="controls">
+            <div id="pad-half"><div id="dpad">
+              <span></span><button data-dir="N">▲</button><span></span>
+              <button data-dir="W">◀</button><span class="hub"></span><button data-dir="E">▶</button>
+              <span></span><button data-dir="S">▼</button><span></span>
+            </div></div>
+            <div id="cmd-half">
+              <button class="cmd accent" data-cmd="interact">Interact</button><button class="cmd" data-cmd="check">Check</button>
+              <button class="cmd" data-cmd="action">Action</button><button class="cmd" data-cmd="back">Back</button>
+              <button class="cmd" data-cmd="rest">Rest</button><button class="cmd" data-cmd="map">Map</button>
+            </div>
+          </div>
+        </div>
+        <div id="choices" hidden>
+          <div class="choice-head"><b id="choice-title"></b><span id="choice-context"></span></div>
+          <div id="choice-groups"></div>
+          <div id="choice-grid"></div>
+          <div id="choice-pager"><button data-page="-1">◀</button><span id="choice-page"></span><button data-page="1">▶</button></div>
+          <div id="choice-desc"></div>
+          <div id="choice-foot"><button class="cmd" id="choice-back">Back</button><button class="cmd accent" id="choice-go">Go</button></div>
+        </div>
+      </div>
+      <div class="page" id="page-bag">
+        <div class="row-head"><b id="bag-money" class="money"></b><span id="bag-who" class="chips"></span></div>
+        <div class="sub">Carried by <span id="bag-name"></span></div>
+        <div id="bag-carried" class="list"></div>
+        <div id="bag-carried-do" class="dobar"></div>
+        <div class="sub">The party's pack</div>
+        <div id="bag-pack" class="list"></div>
+        <div id="bag-pack-do" class="dobar"></div>
+        <p id="bag-message" class="note"></p>
+        <p id="bag-notes" class="small"></p>
+      </div>
+      <div class="page" id="page-party">
+        <div id="party-who" class="faces"></div>
+        <div id="sheet"></div>
+      </div>
+      <div class="page" id="page-quests">
+        <nav id="quest-tabs" class="chips"></nav>
+        <div id="quest-list"></div>
+        <div id="quest-page" hidden></div>
+      </div>
+      <div class="page" id="page-map">
+        <button class="cmd wide accent" id="open-worldmap">Open the world map</button>
+        <div id="pin-line" class="pin" hidden></div>
+        <div id="place"></div>
+      </div>
+      <div class="page" id="page-settings">
+        <button class="cmd wide" id="save-game">Save game</button>
+        <button class="cmd wide" id="save-as">Save as…</button>
+        <div id="save-form" hidden><input id="save-name" maxlength="60" autocomplete="off"><button class="cmd accent" id="save-name-go">Save</button></div>
+        <button class="cmd wide" id="load-game">Load game</button>
+        <div id="save-list" class="list" hidden></div>
+        <button class="cmd wide" id="to-menu">Main menu</button>
+        <label class="check"><input type="checkbox" id="dpad-right"> D-pad on the right</label>
+        <label class="check">Checks: <select id="checks-mode"><option value="Dice">Dice</option><option value="Minigames">Minigames</option></select></label>
+        <label class="check"><input type="checkbox" id="minigame-slow"> Slow minigames</label>
+        <label class="check"><input type="checkbox" id="react"> Take reactions in fights by themselves</label>
+        <div class="sub">Sound</div>
+        <label class="check"><input type="checkbox" id="sound-on"> Sound and music</label>
+        <div id="volumes">
+          <label class="vol">Volume <input type="range" min="0" max="100" step="5" data-vol="volume_master"></label>
+          <label class="vol">Music <input type="range" min="0" max="100" step="5" data-vol="volume_music"></label>
+          <label class="vol">Effects <input type="range" min="0" max="100" step="5" data-vol="volume_effects"></label>
+          <label class="vol">Ambience <input type="range" min="0" max="100" step="5" data-vol="volume_ambience"></label>
+        </div>
+        <div class="sub">Play on another device</div>
+        <div id="share"><img id="share-qr" alt="" hidden><p class="small" id="share-text"></p></div>
+        <p class="small" id="save-note">The game saves by itself as you play, in this browser on this device.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- the world map (the Map tab, or Map on the Walk tab) -->
+<section id="worldmap" hidden>
+  <div id="wm-bar"><b>World map</b><button class="cmd" id="wm-party">Party</button><button class="cmd" id="wm-world">World</button><button class="cmd accent" id="wm-close">Close</button></div>
+  <div id="wm-view"><canvas id="wm-canvas"></canvas>
+    <div id="wm-zoom"><button data-wz="1.6">+</button><button data-wz="0.625">−</button></div>
+    <div id="wm-drawing" class="plaque" hidden></div></div>
+  <div id="wm-info"><span id="wm-text">Tap a town to see it.</span><button class="cmd accent" id="wm-go" hidden>Go there</button></div>
+</section>
+
+<!-- a new game: who's going -->
+<div id="welcome" class="dialog" hidden>
+  <h2 id="welcome-title">A new adventure</h2>
+  <p id="welcome-text"></p>
+  <div class="stack"><button class="cmd wide accent" id="welcome-create">Create my first character</button>
+  <button class="cmd wide" id="welcome-quick">Use ready-made heroes</button></div>
+</div>
+
+<!-- a sheet over everything: the character creator, levelling up, choices, a hero's look -->
+<section id="sheetbox" hidden>
+  <div id="sheetbox-head"><b id="sheetbox-title"></b><button class="cmd" id="sheetbox-close">✕</button></div>
+  <div id="sheetbox-side"><img id="sheetbox-pic" alt=""><div id="sheetbox-lines"></div></div>
+  <div id="sheetbox-body"></div>
+  <p id="sheetbox-problem"></p>
+  <div class="foot" id="sheetbox-foot"><button class="cmd" id="sheetbox-back">Back</button><button class="cmd accent" id="sheetbox-next">Next</button></div>
+</section>
+
+<!-- talking, trading and the app's other small windows (web/panel.py) -->
+<section id="panel" hidden>
+  <div id="panel-head"><b id="panel-title"></b><button class="cmd" id="panel-x">✕</button></div>
+  <div id="panel-who"><img id="panel-pic" alt=""><div><b id="panel-name"></b><div id="panel-sub"></div></div></div>
+  <div id="panel-lines"></div>
+  <div id="panel-blocks"></div>
+  <p id="panel-message"></p>
+  <div class="foot"><button class="cmd" id="panel-close">Done</button></div>
+</section>
+
+<!-- a minigame, or a gambling table (web/games.py) -->
+<section id="play" hidden>
+  <div id="play-title"></div>
+  <div id="play-help"></div>
+  <div id="play-bar"><i></i></div>
+  <div id="play-board"><canvas id="play-canvas"></canvas></div>
+  <div id="play-flash"></div>
+  <div id="play-pads"></div>
+  <div id="play-buttons"></div>
+  <button class="cmd" id="play-quit">Roll the dice instead</button>
+</section>
+
+<!-- the end of a fight, and the party falling for good -->
+<div id="fight-end" class="dialog" hidden>
+  <h2 id="fight-end-title"></h2>
+  <div id="fight-end-body"></div>
+  <div class="foot"><button class="cmd" id="fight-end-skin" hidden>Skin</button><button class="cmd accent" id="fight-end-go">Continue</button></div>
+</div>
+<div id="game-over" class="dialog" hidden>
+  <h2>The party has fallen</h2>
+  <p id="game-over-text"></p>
+  <div id="game-over-saves" class="list"></div>
+  <div class="foot"><button class="cmd accent" id="game-over-new">New party</button></div>
+</div>
+
+<div id="error" hidden><b>Something went wrong</b><pre></pre><button class="cmd" id="error-close">Close</button></div>
+
+<script src="rpc.js?v=3c339da47d"></script>
+<script src="sound.js?v=1e70ede942"></script>
+<script src="map.js?v=6ddb8dc4dc"></script>
+<script src="app.js?v=2e5ff8c2b4"></script>
+<script src="worldmap.js?v=51c4c58636"></script>
+<script src="tabs.js?v=32dea88275"></script>
+<script src="fight.js?v=9a87904ef0"></script>
+<script src="creator.js?v=280384048c"></script>
+<script src="panel.js?v=5879ec2fe9"></script>
+<script src="play.js?v=fa048a1e2e"></script>
+</body>
+</html>

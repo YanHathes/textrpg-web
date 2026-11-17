@@ -1,0 +1,16 @@
+{
+ "name": "YanCo Branded RPG",
+ "short_name": "YanCo RPG",
+ "start_url": ".",
+ "display": "fullscreen",
+ "orientation": "portrait",
+ "background_color": "#000000",
+ "theme_color": "#000000",
+ "icons": [
+  {
+   "src": "icon.png",
+   "sizes": "480x480",
+   "type": "image/png"
+  }
+ ]
+}

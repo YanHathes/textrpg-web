@@ -1,0 +1,6 @@
+/game.zip
+  Cache-Control: no-cache
+/world.zip
+  Cache-Control: no-cache
+/*.js
+  Cache-Control: no-cache
